@@ -7,6 +7,8 @@ This service can be ran as either a user service, or can be ran as a Folderr Ins
 
 We will first start creating a User service, and later we will add the ability for this to be a Instance Service
 
+You can [read the spec](./SPEC.md) if you'd like, to see how Mirror is supposed to work.
+
 Defintions:
 
 - User: A Folderr instance User. **Not to be confused with an OS user**

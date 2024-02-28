@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/Folderr/Mirror-Server/user"
 )
 
 type IndexResponse struct {
@@ -15,9 +18,32 @@ type IndexResponse struct {
 var port int = 7145
 
 func main() {
+	var isInstanceService bool
+	var domain string
+
+	flag.BoolVar(&isInstanceService, "service", false, "Whether or not to run Mirror as a service of a Folderr instance")
+
+	flag.StringVar(&domain, "domain", "", "The domain you want to listen on")
+	flag.Parse()
+
+	if isInstanceService {
+		log.Fatal("Running Mirror as a service of a Folderr instance is not yet supported")
+	}
+	// if domain == "" {
+	//	log.Fatal("Missing the domain flag.\nPlease run \"Mirror-Server -h\" for help")
+	// }
+
+	if !isInstanceService && domain != "" {
+		err := user.DomainCheck(domain)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+
+	// handle light config, this is temporary
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Got / request")
+		//		log.Println("Got / request")
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(IndexResponse{Code: 200, Message: "Mirror Operational"})
 	})

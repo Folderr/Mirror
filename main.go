@@ -1,3 +1,7 @@
+//go:build go1.22
+
+// Mirror relies upon specific updates to the net/http in go 1.22
+
 package main
 
 import (

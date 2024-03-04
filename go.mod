@@ -1,3 +1,3 @@
-module github.com/Folderr/Mirror-Server
+module github.com/Folderr/Mirror
 
-go 1.21.6
+go 1.22.0

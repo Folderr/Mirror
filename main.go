@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Folderr/Mirror-Server/user"
+	"github.com/Folderr/Mirror/user"
 )
 
 type IndexResponse struct {

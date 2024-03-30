@@ -72,6 +72,8 @@ Folderr times out after ~5-10 seconds of checking
 
 When used in `user` mode, Mirror will require you to uploaded a proof of your domain as DNS TXT entry
 
+This allows Folderr to verify you own the domain.
+
 Example Entry
 
 ```sh
@@ -81,6 +83,8 @@ TTL: 300
 Type: TXT
 Weight: 0
 ```
+
+Note: Mirror will *not* generate this, Folderr will.
 
 ## Verifying you own a domain (service, for an instance's Mirror)
 

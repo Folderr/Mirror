@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -23,36 +24,46 @@ type InfoReturn struct {
 	Message InfoReturnMessage `json:"message"`
 }
 
-func check(domain *url.URL) (isOnline bool, err error) {
+func check(domain *url.URL) (isOnline bool, rawBody string, err error) {
 	if domain.Scheme == "" {
 		domain.Scheme = "http"
 	}
 
 	resp, err := http.Get(domain.Scheme + "://" + domain.Host + "/api")
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 
 	if resp.StatusCode != 200 {
-		return false, fmt.Errorf("non 200 status code recieved")
+		return false, "", fmt.Errorf("non 200 status code recieved")
 	}
 
 	if resp.Header.Get("Content-Type") == "" || !strings.Contains(resp.Header.Get("Content-Type"), "application/json") {
-		return false, fmt.Errorf("response type was not json")
+		return false, "", fmt.Errorf("response type was not json")
 	}
 
-	var output InfoReturn
-	err = json.NewDecoder(resp.Body).Decode(&output)
-
+	bytes, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
 	if err != nil {
-		return false, err
+		return false, "", err
+	}
+	outRaw := string(bytes)
+
+	var output InfoReturn
+	err = json.Unmarshal(bytes, &output)
+
+	if err != nil && strings.Contains(err.Error(), "cannot unmarshal") && strings.Contains(err.Error(), "type") {
+		return false, "", fmt.Errorf("unexpected json output")
+	}
+	if err != nil {
+		return false, outRaw, err
 	}
 
 	if output.Message.Message != "Pong!" && output.Message.Message != "OK" {
-		return false, fmt.Errorf("unexpected body return, unsure if Folderr")
+		return false, outRaw, fmt.Errorf("unexpected body return, unsure if Folderr")
 	}
 
-	return true, nil
+	return true, outRaw, nil
 }
 
 var ticker *time.Ticker
@@ -63,17 +74,28 @@ func CheckStatus(domain *url.URL) {
 	instanceOnline = false
 	go func() {
 		for range ticker.C {
-			isOK, err := check(domain)
+			isOK, rawBody, err := check(domain)
 			urlErrTarget := &url.Error{}
-			if errors.As(err, &urlErrTarget) && err.(*url.Error).Timeout() {
-				log.Println("Timeout occurred during health check on instance.")
-				instanceOnline = false
-			} else if errors.As(err, &urlErrTarget) && strings.Contains(err.Error(), "actively refused") {
-				log.Println("Health check connection refused. Change!")
-				instanceOnline = false
-			} else if err != nil {
-				fmt.Println("Unknown Error occurred while performing healthcheck, see below")
-				log.Println(err)
+
+			if err != nil {
+				if errors.As(err, &urlErrTarget) && err.(*url.Error).Timeout() {
+					log.Println("Err: Timeout occurred during health check on instance.")
+					instanceOnline = false
+				} else if errors.As(err, &urlErrTarget) && strings.Contains(err.Error(), "actively refused") {
+					log.Println("Err: Health check connection refused.")
+					instanceOnline = false
+				} else if err.Error() == "unexpected json output" {
+					log.Println("Err: Got back an unexpected body, see below")
+					log.Println(rawBody)
+				} else if err.Error() == "unexpected body return, unsure if Folderr" {
+					log.Println("Not sure this is Folderr. Check the body return below (if there is one)")
+					if rawBody != "" {
+						log.Println(rawBody)
+					}
+				} else {
+					log.Println("Unknown Error occurred while performing healthcheck, see below")
+					log.Println(err.Error())
+				}
 				instanceOnline = false
 			} else {
 				instanceOnline = isOK

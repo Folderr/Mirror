@@ -27,7 +27,7 @@ What you as a user should expect: You can only serve your own domains
 ### Running / Usage
 
 ```sh
-mirror-server
+mirror -domain <instance url, not your domain url>
 ```
 
 ## Instance Service
@@ -47,7 +47,7 @@ This is planned to be finished after the User Service. These notes are to provid
 ### Running / Usage
 
 ```sh
-mirror-server --service
+mirror --service
 ```
 
 The `service` flag tells the Mirror you're running it as a service for multiple users
@@ -66,8 +66,8 @@ Unsupported during `v0`. Please build from source instead
 ### Building
 
 ```sh
-git clone https://github.com/Folderr/Mirror-Server.git
-cd Mirror-Server
+git clone https://github.com/Folderr/Mirror.git
+cd Mirror
 go build .
 ```
 
@@ -75,11 +75,11 @@ go build .
 
 ```sh
 # This assumes you're in the directory of the source code and have built the source code
-sudo cp Mirror-Server /opt/mirror-server
+sudo cp Mirror /opt/mirror
 ```
 
 ### Placing it in your path (user)
 
 ```sh
-cp Mirror-Server /home/$USER/.local/bin/mirror-server
+cp Mirror /home/$USER/.local/bin/mirror
 ```

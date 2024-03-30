@@ -18,6 +18,10 @@
 Mirror-Server
 Mirror-Server.exe
 
+# air tmp files
+
+tmp/
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
 

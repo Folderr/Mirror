@@ -49,6 +49,12 @@ func check(domain *url.URL) (isOnline bool, rawBody string, err error) {
 	}
 	outRaw := string(bytes)
 
+	// let's see if this is valid JSON
+
+	if !json.Valid(bytes) {
+		return false, outRaw, fmt.Errorf("response data claimed json. was not json.")
+	}
+
 	var output InfoReturn
 	err = json.Unmarshal(bytes, &output)
 
@@ -88,10 +94,13 @@ func CheckStatus(domain *url.URL) {
 					log.Println("Err: Got back an unexpected body, see below")
 					log.Println(rawBody)
 				} else if err.Error() == "unexpected body return, unsure if Folderr" {
-					log.Println("Not sure this is Folderr. Check the body return below (if there is one)")
+					log.Println("Not sure this domain is Folderr. Check the body return below (if there is one)")
 					if rawBody != "" {
 						log.Println(rawBody)
 					}
+				} else if err.Error() == "response data claimed json. was not json." {
+					log.Println("Err (Health Check): response data claimed to be JSON even though it wasn't. See below for data")
+					log.Println(rawBody)
 				} else {
 					log.Println("Unknown Error occurred while performing healthcheck, see below")
 					log.Println(err.Error())

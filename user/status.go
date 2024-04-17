@@ -52,7 +52,7 @@ func check(domain *url.URL) (isOnline bool, rawBody string, err error) {
 	// let's see if this is valid JSON
 
 	if !json.Valid(bytes) {
-		return false, outRaw, fmt.Errorf("response data claimed json. was not json.")
+		return false, outRaw, fmt.Errorf("response data claimed json. was not json")
 	}
 
 	var output InfoReturn

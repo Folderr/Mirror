@@ -1,5 +1,7 @@
 # .github/workflows/release.yaml
 
+name: Build Binaries upon Release
+
 on:
   release:
     types: [created]
@@ -27,7 +29,6 @@ jobs:
     - uses: wangyoucao577/go-release-action@v1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        compress-assets: false
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
         goversion: 1.22

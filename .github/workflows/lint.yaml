@@ -1,0 +1,25 @@
+name: Lint
+on: [push, pull_request]
+
+jobs:
+  ci:
+    name: "Lint"
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go: ['1.22.x']
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{matrix.go}}
+      - name: Run Vet
+        run: go vet ./...
+      - name: Run Staticcheck
+        uses: dominikh/staticcheck-action@v1
+        with:
+          install-go: false
+          cache-key: ${{matrix.go}}

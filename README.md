@@ -1,6 +1,8 @@
 # Mirror-Server
 
 The Mirror Server &amp; Spec for Folderr's "Mirror" service
+[![Build](https://github.com/Folderr/Mirror/actions/workflows/build.yaml/badge.svg)](https://github.com/Folderr/Mirror/actions/workflows/build.yaml)
+[![Build Release Binaries](https://github.com/Folderr/Mirror/actions/workflows/release.yaml/badge.svg?event=release)](https://github.com/Folderr/Mirror/actions/workflows/release.yaml)
 
 Essentially, this is the service allowing users to utilize their own domains for Folderr
 This service can be ran as either a user service, or can be ran as a Folderr Instance service.
